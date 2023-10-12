@@ -1,0 +1,16 @@
+server:
+  port: 8888
+spring:
+  http-pool:
+    # 连接池最大连接数
+    max-total: 3000
+    # 每个rount请求的最大连接数
+    default-max-per-route: 20
+    # 空闲多长时间（毫秒）来校验连接的有效性
+    validate-after-inactivity: 2000
+    # 建立连接的最大超时时间（毫秒）
+    connect-timeout: 20000
+    # 获取连接的最大超时时间（毫秒）
+    connection-request-timeout: 20000
+    # 与服务端保持连接的最大时间（毫秒）
+    socket-timeout: 20000

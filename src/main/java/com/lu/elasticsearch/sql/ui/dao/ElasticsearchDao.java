@@ -1,5 +1,6 @@
 package com.lu.elasticsearch.sql.ui.dao;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -7,9 +8,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class ElasticsearchDao {
@@ -38,7 +41,9 @@ public class ElasticsearchDao {
     private HttpPost getHttpPost(String uri, String username, String password, String sql) throws UnsupportedEncodingException {
         HttpPost httpPost = new HttpPost(uri);
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-            httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + username + " " + password);
+            String auth = username + ":" + password;
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+            httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(encodedAuth));
         }
         httpPost.setHeader(HttpHeaders.CONTENT_TYPE, JSON);
         httpPost.setEntity(new StringEntity(sql));

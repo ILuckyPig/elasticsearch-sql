@@ -6,6 +6,7 @@ import com.lu.elasticsearch.sql.ui.dto.TableDTO;
 import com.lu.elasticsearch.sql.ui.service.SqlEditorService;
 import com.lu.elasticsearch.sql.ui.util.JsonUtil;
 import com.lu.elasticsearch.sql.ui.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/editor")
 public class SqlEditorController {
@@ -24,6 +26,7 @@ public class SqlEditorController {
 
     @RequestMapping(value = "/explain", method = RequestMethod.POST)
     public @ResponseBody Result<DslVO> explain(@RequestBody SqlVO sqlVO) throws IOException {
+        log.info("explain SqlVO is {}", sqlVO);
         DslDTO dslDTO = sqlEditorService.explain(sqlVO);
         DslVO dslVO = new DslVO();
         BeanUtils.copyProperties(dslDTO, dslVO);
@@ -32,6 +35,7 @@ public class SqlEditorController {
 
     @RequestMapping(value = "/query", method = RequestMethod.POST)
     public @ResponseBody Result<TableVO> query(@RequestBody SqlVO sqlVO) throws IOException {
+        log.info("query SqlVO is {}", sqlVO);
         TableDTO tableDTO = sqlEditorService.query(sqlVO);
         TableVO tableVO = convertToTableVO(tableDTO);
         return Result.data(tableVO);

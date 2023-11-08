@@ -48,7 +48,6 @@ public class SqlEditorService {
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity);
             EntityUtils.consume(entity);
-            log.info("query result is: {}", result);
 
             ResultHandler resultHandler = ResultHandlerFactory.createResultHandler(sql, result, false, false, false);
             Table table = resultHandler.getTable(sql, result);

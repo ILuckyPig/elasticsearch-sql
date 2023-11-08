@@ -4,6 +4,7 @@ import com.facebook.presto.sql.parser.ParsingOptions;
 import com.facebook.presto.sql.tree.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.elasticsearch.sql.ui.common.table.Table;
 import com.lu.elasticsearch.sql.ui.common.table.scheme.TableScheme;
@@ -96,8 +97,7 @@ public class DefaultQueryResultHandler implements ResultHandler {
         }
 
         if (tableScheme.isRefresh()) {
-            JsonNode firstHit = hits.get(0);
-            updateTableColumns(tableScheme, firstHit);
+            updateTableColumns(tableScheme, hits);
         }
 
         List<String[]> dataList = new ArrayList<>(hits.size());
@@ -110,12 +110,18 @@ public class DefaultQueryResultHandler implements ResultHandler {
         return dataList;
     }
 
-    private void updateTableColumns(TableScheme tableScheme, JsonNode firstHit) {
-        JsonNode source = firstHit.get("_source");
-        Iterator<String> fieldNameIterator = source.fieldNames();
+    private void updateTableColumns(TableScheme tableScheme, JsonNode hits) {
         List<String> columnList = Arrays.stream(tableScheme.getColumns()).collect(Collectors.toList());
-        while (fieldNameIterator.hasNext()) {
-            columnList.add(fieldNameIterator.next());
+        Set<String> existingColumnSet = new HashSet<>(columnList);
+        for (JsonNode hit : hits) {
+            JsonNode source = hit.get("_source");
+            Iterator<String> fieldNameIterator = source.fieldNames();
+            while (fieldNameIterator.hasNext()) {
+                String fieldName = fieldNameIterator.next();
+                if (!existingColumnSet.contains(fieldName)) {
+                    columnList.add(fieldName);
+                }
+            }
         }
         tableScheme.setColumns(columnList.toArray(new String[0]));
     }
@@ -139,6 +145,8 @@ public class DefaultQueryResultHandler implements ResultHandler {
         JsonNode cell;
         if (source.has(column)) {
             cell = source.get(column);
+        } else if (fields == null) {
+            cell = NullNode.getInstance();
         } else {
             JsonNode field = fields.get(column);
             if (field.size() == 1) {

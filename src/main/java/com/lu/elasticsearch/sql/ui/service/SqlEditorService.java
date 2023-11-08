@@ -9,6 +9,7 @@ import com.lu.elasticsearch.sql.ui.dto.DslDTO;
 import com.lu.elasticsearch.sql.ui.dto.TableDTO;
 import com.lu.elasticsearch.sql.ui.util.JsonUtil;
 import com.lu.elasticsearch.sql.ui.vo.SqlVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class SqlEditorService {
     private final ElasticsearchDao elasticsearchDao;
@@ -46,6 +48,7 @@ public class SqlEditorService {
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity);
             EntityUtils.consume(entity);
+            log.info("query result is: {}", result);
 
             ResultHandler resultHandler = ResultHandlerFactory.createResultHandler(sql, result, false, false, false);
             Table table = resultHandler.getTable(sql, result);

@@ -119,6 +119,7 @@ public class DefaultQueryResultHandler implements ResultHandler {
             while (fieldNameIterator.hasNext()) {
                 String fieldName = fieldNameIterator.next();
                 if (!existingColumnSet.contains(fieldName)) {
+                    existingColumnSet.add(fieldName);
                     columnList.add(fieldName);
                 }
             }
